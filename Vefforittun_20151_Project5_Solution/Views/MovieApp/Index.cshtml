@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Vefforittun_20151_Project5_Solution.Models.Movie>
+
+@{
+    ViewBag.Title = "Movies";
+}
+
+<h2>Movies</h2>
+
+<div class="row" style="margin-bottom: 25px; margin-top: 25px; ">
+    <div class="pull-right">
+        <div class="btn-group btn-group-justified movie-views" data-toggle="buttons">
+            <label class="btn btn-default active">
+                <input type="radio" name="options" id="option1" autocomplete="off" value="list" checked> List
+            </label>
+            <label class="btn btn-default">
+                <input type="radio" name="options" id="option2" autocomplete="off" value="poster"> Posters
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row movies-list">
+
+    @foreach (var item in Model)
+    {
+        string lastcat = item.Categories.Last();
+        <div class="media">
+            <a class="media-left" href="@Url.Action("Detail", "MovieApp", new { id = item.Id })">
+                <img src="@Url.Content(item.ThumbnailUrlSmall)" alt="poster" style="width: 64px;height: 90px;">
+            </a>
+            <div class="media-body">
+                <h4 class="media-heading">
+                    @Html.ActionLink(item.Title, "Detail", "MovieApp", new { id = item.Id }, new { @class = "" }) (@item.ReleaseDate.ToString("yyyy"))
+                </h4>
+                <section>
+                    <span>Rating: </span>
+                    <span>@item.RatingOverall </span>
+                </section>
+                <p>@Html.DisplayFor(modelItem => item.DescriptionShort)</p>
+                <p>@item.Length <span>min</span></p>
+                <p>
+                    @foreach (var cat in item.Categories)
+                    {
+                        if (cat == lastcat)
+                        {
+                            <span>@cat</span>
+                        }
+                        else
+                        {
+                            <span>@cat</span>
+                            <span> |</span>
+                        }
+                    }
+                </p>
+            </div>
+        </div>
+    }
+
+</div>
+
+<div class="row movies-poster" style="display:none;">
+    @foreach (var item in Model)
+    {
+        string shorTitle = item.Title.Length > 20 ? item.Title.Substring(0,20) + ".." : item.Title;
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <a href="@Url.Action("Detail", "MovieApp", new { id = item.Id })">
+                    <img alt="poster" src="@Url.Content(item.ThumbnailUrlSmall)" data-holder-rendered="true" style="height: 317px; width: 214px; display: block;">
+                </a>
+                <div class="caption">
+                    <h3 title="@item.Title">
+                        @Html.ActionLink(@shorTitle, "Detail", "MovieApp", new { id = item.Id }, new { @class = "" })
+                    </h3>
+                    <p>(@item.ReleaseDate.ToString("yyyy"))</p>
+                </div>
+            </div>
+        </div>      
+    }
+</div>

@@ -1,0 +1,161 @@
+﻿@model Vefforittun_20151_Project5_Solution.Models.Movie
+
+@{
+    ViewBag.Title = "Detail";
+    int currentUserRating = Model.CurrentUserRating != null ? Model.CurrentUserRating.rating : 0;
+    string noSelection = currentUserRating == 0 ? "selected" : "";
+}
+
+<h2>Detail</h2>
+
+<div class="row">
+    <div class="col-sm-6 col-md-4">
+        <div class="thumbnail">
+            <img alt="poster" src="@Url.Content(Model.ThumbnailUrlSmall)" data-holder-rendered="true" style="height: 317px; width: 214px; display: block;">
+            <div class="caption">
+                <h3>Rating: @Model.RatingOverall</h3>                                
+                @if(Model.CurrentUserRating != null)
+                {
+                    <p>I rated @Model.CurrentUserRating.rating Stars</p>
+                }
+                else
+                {
+                    <p>You have not rated this movie</p>    
+                }  
+                @using (Html.BeginForm("RateMovie", "MovieApp"))
+                {
+                    <input type="hidden" name="movieid" value="@Model.Id" />
+                    <div class="form-horizontal">
+                        <label class="sr-only" for="rateinfo">Rate</label>                        
+                        <select name="rateinfo" id="rateinfo">
+                            <option value="" @noSelection></option>
+                            @for (int i = 1; i <= 10; i++)
+                            {
+                                string sel = i == currentUserRating ? "selected" : "";
+                                <option value="@i" @sel>@i</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-primary">Rate</button>
+                    </div>
+                    @Html.ValidationSummary(false)
+                }                
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-8">
+        @{
+            string lastcat = Model.Categories.Last();
+            string lastwriter = Model.Writers.Last();
+            string lastactor = Model.Actors.Last();
+        }
+        <h3>@Model.Title (@Model.ReleaseDate.ToString("yyyy"))</h3>
+        <p>
+            @foreach (var cat in Model.Categories)
+            {
+                if (cat == lastcat)
+                {
+                    <span>@cat</span>
+                }
+                else
+                {
+                    <span>@cat</span><span> |</span>
+                }
+            }
+        </p>        
+
+        <p>@Model.DescriptionShort</p>
+        <p>@Model.Length <span>min</span></p>
+
+        <p>
+            Director: 
+            @foreach(var dir in Model.Directors)
+            {
+                <span>@dir </span>
+            }
+        </p>
+        <p>
+            Writers:
+            @foreach (var writer in Model.Writers)
+            {
+                if (writer == lastwriter)
+                {
+                    <span>@writer</span>
+                }
+                else
+                {
+                    <span>@writer</span><span> |</span>
+                }                
+            }
+        </p>
+        <p>
+            Actors:
+            @foreach (var actor in Model.Actors)
+            {
+                if (actor == lastactor)
+                {
+                    <span>@actor</span>
+                }
+                else
+                {
+                    <span>@actor</span><span> |</span>
+                }                 
+            }
+        </p>
+
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+            Watch Trailer
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">@Model.Title (@Model.ReleaseDate.ToString("yyyy"))</h4>
+                    </div>
+                    <div class="modal-body" data-videoid="@Model.VideoLInk">
+                        <div id="player"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>                                      
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-sm-6 col-md-12">        
+        <section>
+            <h4>Reviews</h4>
+            @foreach(var review in Model.Reviews)
+            {
+                <p>@review.Username | @review.Text</p>
+            }
+        </section>
+        <section>
+            <h4>Add Review</h4>
+            @using (Html.BeginForm("ReviewMovie", "MovieApp"))
+            {
+                <input type="hidden" name="movieid" value="@Model.Id"/>
+                <div class="form-horizontal">
+                    <label class="sr-only" for="reviewtext">Review</label>
+                    <textarea class="form-control" rows="5" id="reviewtext" name="reviewtext" style="max-width:100%"></textarea>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+                @Html.ValidationSummary(false)
+            }
+        </section>
+    </div>
+</div>
+
+
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
